@@ -13,11 +13,11 @@ def main(argv):
     cpu.loadRom(program)
     fin.close()
 
-    for pc,a,d in cpu:
+    for pc in cpu:
         sp = cpu.peek(0)
         instruction = cpu.rom[pc]
 
-        print "%d: %s, A=%s, D=%s, SP=%d"%(pc,bin(instruction),int(a),int(d),sp)
+        print "%d: %s, A=%s, D=%s, SP=%d"%(pc,bin(instruction),int(cpu.a),int(cpu.d),sp)
 
 class HackCpu(object):
     def __init__(self):
@@ -40,6 +40,7 @@ class HackCpu(object):
         if self.pc>=2**15-1:
             raise StopIteration
         else:
+            oldpc = self.pc
             instruction = self.rom[self.pc]
 
             if instruction&0x8000==0:
@@ -126,7 +127,7 @@ class HackCpu(object):
                     if lt:
                         self.pc = self.a
 
-        return self.pc,self.a,self.d
+        return oldpc
 
     def peek(self,i):
         if i>=0 and i<2**15:
