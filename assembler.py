@@ -26,7 +26,10 @@ def main(argv):
             'THIS':3,
             'THAT':4,
             'SCREEN':16384,
-            'KBD':24576}
+            'KBD':24576,
+            # I added the following symbols for special areas
+            'STDIO':24576,
+            }
     for i in range(16):
         symbol_table['R%d'%i]=i
 
@@ -203,6 +206,7 @@ class Code(object):
         retval = self.jump_table[mnemonic]
         return retval
 
+# Note: I didn't end up using this
 class SymbolTable(object):
     def __init__(self):
         self.table = {'SP':0,
