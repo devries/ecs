@@ -3,6 +3,8 @@ import sys
 import string
 import os
 import glob
+import re
+
 C_ARITHMETIC = 1
 C_PUSH = 2
 C_POP = 3
@@ -15,6 +17,7 @@ C_CALL = 9
 
 arithmetic_commands = ['add','sub','neg','eq','gt','lt','and','or','not']
 segments = ['argument','local','static','constant','this','that','pointer','temp']
+char_escapes = {r'\n': 10, r'\t': 9, r'\'': 39, r'\r': 13, r'\\': 92}
 
 stack_start = 256
 heap_start = 2048
@@ -52,7 +55,7 @@ def main(argv):
             if psr.commandType()==C_ARITHMETIC:
                 cdwr.writeArithmetic(psr.arg1())
             elif psr.commandType()==C_PUSH or psr.commandType()==C_POP:
-                cdwr.writePushPop(psr.commandType(),psr.arg1(),int(psr.arg2()))
+                cdwr.writePushPop(psr.commandType(),psr.arg1(),psr.arg2())
             elif psr.commandType()==C_LABEL:
                 cdwr.writeLabel(psr.arg1())
             elif psr.commandType()==C_GOTO:
@@ -103,7 +106,7 @@ class Parser(object):
 
     def advance(self):
         # Parse stuff right here
-        components = self.next_command.split()
+        components = self.next_command.split(None,2)
         command = components[0]
         if command == "push":
             self.command_type = C_PUSH
@@ -265,36 +268,45 @@ class CodeWriter(object):
 
     def writePushPop(self,command,segment,index):
         if segment=='constant':
-            self.writecommand('@%d'%index)
+            character = re.compile(r"'(.|\\.)'")
+            match = character.match(index)
+            if match:
+                if match.group(1).startswith('\\'):
+                    num_val = char_escapes[match.group(1)]
+                else:
+                    num_val = ord(match.group(1))
+            else:
+                num_val = int(index)
+            self.writecommand('@%d'%num_val)
             self.writecommand('D=A')
         elif segment=='local':
             self.writecommand('@LCL')
             self.writecommand('D=M')
-            self.writecommand('@%d'%index)
+            self.writecommand('@%d'%int(index))
             self.writecommand('A=D+A')
         elif segment=='argument':
             self.writecommand('@ARG')
             self.writecommand('D=M')
-            self.writecommand('@%d'%index)
+            self.writecommand('@%d'%int(index))
             self.writecommand('A=D+A')
         elif segment=='this':
             self.writecommand('@THIS')
             self.writecommand('D=M')
-            self.writecommand('@%d'%index)
+            self.writecommand('@%d'%int(index))
             self.writecommand('A=D+A')
         elif segment=='that':
             self.writecommand('@THAT')
             self.writecommand('D=M')
-            self.writecommand('@%d'%index)
+            self.writecommand('@%d'%int(index))
             self.writecommand('A=D+A')
         elif segment=='temp':
-            rampos = temp_start+index
+            rampos = temp_start+int(index)
             self.writecommand('@%d'%rampos)
         elif segment=='pointer':
-            rampos = pointer_start+index
+            rampos = pointer_start+int(index)
             self.writecommand('@%d'%rampos)
         elif segment=='static':
-            self.writecommand('@%s.%d'%(self.current_fileroot,index))
+            self.writecommand('@%s.%d'%(self.current_fileroot,int(index)))
         else:
             raise NotImplementedError("Segment %s is not implemented"%segment)
 
@@ -325,7 +337,7 @@ class CodeWriter(object):
         self.writecommand('(%s)'%function_label)
         self.current_function = function_label
         for i in range(local_variables):
-            self.writePushPop(C_PUSH,'constant',0)
+            self.writePushPop(C_PUSH,'constant','0')
 
     def writeCall(self,function_label,nargs):
         # Push return address on stack

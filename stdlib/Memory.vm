@@ -1,0 +1,84 @@
+call Memory.init 0
+push constant 5
+call Memory.alloc 1
+pop pointer 0
+push constant 0
+pop this 0
+push constant 1
+pop this 1
+push constant 2
+pop this 2
+push constant 3
+pop this 3
+push pointer 0
+call Memory.dealloc 1
+label WHILE
+goto WHILE
+
+// Memory initialization takes 0 arguments
+function Memory.init 0
+push constant 2048
+pop static 0 // free list pointer is in static 0
+push static 0
+pop pointer 0
+push constant 14334 // length of heap is 14334
+pop this 0
+push static 0 // There are no more free blocks
+pop this 1
+
+// Allocate memory, Takes one argument: The size to allocate
+function Memory.alloc 1
+push argument 1
+push constant 1
+add
+pop local 0 // We need a block that is the size we want plus 1 for the size byte
+push static 0
+pop pointer 0
+label CHECKBLOCK
+push local 0
+push this 0
+gt
+if-goto NEXTBLOCK
+goto FOUNDBLOCK
+label NEXTBLOCK
+push this 1
+push constant 0
+eq
+if-goto FAILURE
+push this 1
+pop pointer 0
+goto CHECKBLOCK
+label FOUNDBLOCK
+push this 0
+push local 0
+sub
+push pointer 0
+push local 0
+pop pointer 1
+pop that 0
+push this 1
+pop that 1
+push argument 0
+pop this 0
+push pointer 0
+push constant 1
+add
+goto RETURN
+label FAILURE
+push constant 0
+label RETURN
+return
+
+// Deallocate memory. Takes one argument: starting address of block
+function Memory.dealloc 0
+push argument 0
+push constant 1
+neg
+add
+pop pointer 0
+push static 0
+pop this 1
+push pointer 0
+pop static 0
+push constant 0
+return

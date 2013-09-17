@@ -1,0 +1,44 @@
+// set STDIO in THIS pointer
+push constant 24576
+pop pointer 0
+
+// Write Hello World!
+push constant 'H'
+pop this 0
+push constant 'e'
+pop this 0
+push constant 'l'
+pop this 0
+push constant 'l'
+pop this 0
+push constant 'o'
+pop this 0
+push constant ' '
+pop this 0
+push constant 'W'
+pop this 0
+push constant 'o'
+pop this 0
+push constant 'r'
+pop this 0
+push constant 'l'
+pop this 0
+push constant 'd'
+pop this 0
+push constant '!'
+pop this 0
+push constant '\n'
+pop this 0
+
+// Print input
+label OUTERLOOP
+label INNERLOOP
+push this 0
+pop static 0      // Save a copy of the input to a static memory space
+push static 0     // compare input with 0
+push constant 0
+eq
+if-goto INNERLOOP
+push static 0
+pop this 0
+goto OUTERLOOP

@@ -1,0 +1,168 @@
+// Multiplication takes two arguments, the integers to multiply
+// and returns the multiple.
+function Math.multiply 4
+push constant 0
+pop local 0
+push argument 0
+pop local 1
+push constant 1
+pop local 2
+push constant 32767
+neg
+push constant 1
+sub
+pop local 3
+label FORLOOP
+push local 2
+push local 3
+eq
+if-goto ENDFOR
+push local 2
+push argument 1
+and
+push constant 0
+eq
+if-goto CONTINUE
+push local 0
+push local 1
+add
+pop local 0
+label CONTINUE
+push local 1
+push local 1
+add
+pop local 1
+push local 2
+push local 2
+add
+pop local 2
+goto FORLOOP
+label ENDFOR
+push local 0
+return
+
+// Long division algorythm
+// Takes two arguments, x and y, and returns x/y where x>-=0 and y>0
+function Math.divide 3
+push constant 0
+pop local 0 // Q variable = quotient
+push constant 0
+pop local 1 // R variable = remainder
+push constant 0
+push constant 1
+label ILOOP
+pop local 2
+push local 2
+push constant 32767
+neg
+push constant 1
+sub
+push local 2
+eq
+if-goto FORLOOP
+push local 2
+push local 2
+add
+goto ILOOP
+label FORLOOP
+pop local 2
+push local 2
+push constant 0
+eq
+if-goto ENDFORLOOP
+push local 1
+push local 1
+add
+pop local 1
+push local 2
+push argument 0
+and
+push constant 0
+eq
+if-goto ISEQUAL
+push constant 1
+push local 1
+add
+pop local 1
+label ISEQUAL
+push local 1
+push argument 1
+lt
+if-goto ISLESS
+push local 1
+push argument 1
+sub
+pop local 1
+push local 0
+push local 2
+add
+pop local 0
+label ISLESS
+goto FORLOOP
+label ENDFORLOOP
+push local 0
+return
+
+// Modulo algorythm
+// Same as long division above, but returns remainder
+// Takes two arguments, x and y, and returns x/y where x>-=0 and y>0
+function Math.modulo 3
+push constant 0
+pop local 0 // Q variable = quotient
+push constant 0
+pop local 1 // R variable = remainder
+push constant 0
+push constant 1
+label ILOOP
+pop local 2
+push local 2
+push constant 32767
+neg
+push constant 1
+sub
+push local 2
+eq
+if-goto FORLOOP
+push local 2
+push local 2
+add
+goto ILOOP
+label FORLOOP
+pop local 2
+push local 2
+push constant 0
+eq
+if-goto ENDFORLOOP
+push local 1
+push local 1
+add
+pop local 1
+push local 2
+push argument 0
+and
+push constant 0
+eq
+if-goto ISEQUAL
+push constant 1
+push local 1
+add
+pop local 1
+label ISEQUAL
+push local 1
+push argument 1
+lt
+if-goto ISLESS
+push local 1
+push argument 1
+sub
+pop local 1
+push local 0
+push local 2
+add
+pop local 0
+label ISLESS
+goto FORLOOP
+label ENDFORLOOP
+push local 1
+return
+
