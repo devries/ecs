@@ -3,17 +3,19 @@ import sys
 import time
 import threading
 import Queue
+import argparse
 
 STDIO_MEM = 24576
 
 def main(argv):
-    if len(argv)!=2:
-        print "Usage: %s <ROM>"%(argv[0])
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description='Hack CPU Emulator')
+    parser.add_argument('rom_file', help='Assembled ROM file')
+    parser.add_argument('-v', '--verbose', help='verbose output', action="store_true")
+    args = parser.parse_args()
 
     cpu = HackCpu()
 
-    fin = open(argv[1])
+    fin = open(args.rom_file)
     program = [int(l,2)&0xffff for l in fin]
     cpu.loadRom(program)
     fin.close()
@@ -24,8 +26,9 @@ def main(argv):
         instruction = cpu.rom[pc]
         i+=1
 
-        print "{:7d} -> {:5d}: {:016b}, A={:04x}, D={:04x}, SP={:5d}".format(i,pc,instruction,cpu.a,cpu.d,sp)
-        print "    Memory of interest: 256:{:5d}, 263:{:5d}, 264:{:5d}, 265:{:5d}".format(cpu.peek(256),cpu.peek(263),cpu.peek(264),cpu.peek(265))
+        if args.verbose:
+            print "{:7d} -> {:5d}: {:016b}, A={:04x}, D={:04x}, SP={:5d}".format(i,pc,instruction,cpu.a,cpu.d,sp)
+            print "    Memory of interest: 256:{:5d}, 263:{:5d}, 264:{:5d}, 265:{:5d}".format(cpu.peek(256),cpu.peek(263),cpu.peek(264),cpu.peek(265))
         time.sleep(0.01)
 
 class HackCpu(object):
