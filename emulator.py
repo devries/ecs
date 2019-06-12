@@ -11,6 +11,8 @@ def main(argv):
     parser = argparse.ArgumentParser(description='Hack CPU Emulator')
     parser.add_argument('rom_file', help='Assembled ROM file')
     parser.add_argument('-v', '--verbose', help='verbose output', action="store_true")
+    parser.add_argument('-d', '--dump', help='range of memory to dump in format start:stop')
+    parser.add_argument('-s', '--sleep', help='sleep between iterations', type=float, default=0.01)
     args = parser.parse_args()
 
     cpu = HackCpu()
@@ -21,15 +23,27 @@ def main(argv):
     fin.close()
     i = 0
 
-    for pc in cpu:
-        sp = cpu.peek(0)
-        instruction = cpu.rom[pc]
-        i+=1
+    try:
+        for pc in cpu:
+            sp = cpu.peek(0)
+            instruction = cpu.rom[pc]
+            i+=1
 
-        if args.verbose:
-            print "{:7d} -> {:5d}: {:016b}, A={:04x}, D={:04x}, SP={:5d}".format(i,pc,instruction,cpu.a,cpu.d,sp)
-            print "    Memory of interest: 256:{:5d}, 263:{:5d}, 264:{:5d}, 265:{:5d}".format(cpu.peek(256),cpu.peek(263),cpu.peek(264),cpu.peek(265))
-        time.sleep(0.01)
+            if args.verbose:
+                print "{:7d} -> {:5d}: {:016b}, A={:04x}, D={:04x}, SP={:5d}".format(i,pc,instruction,cpu.a,cpu.d,sp)
+                # print "    Memory of interest: 256:{:5d}, 263:{:5d}, 264:{:5d}, 265:{:5d}".format(cpu.peek(256),cpu.peek(263),cpu.peek(264),cpu.peek(265))
+            time.sleep(args.sleep)
+
+    except KeyboardInterrupt:
+        print "Ending Program"
+
+    if args.dump is not None:
+        start, stop = args.dump.split(':',1)
+        starti = int(start)
+        stopi = int(stop)
+
+        for i in xrange(starti,stopi):
+            print "{:5d}: {:5d}".format(i,cpu.peek(i))
 
 class HackCpu(object):
     def __init__(self):

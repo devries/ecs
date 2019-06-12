@@ -29,6 +29,7 @@ def main(argv):
             'KBD':24576,
             # I added the following symbols for special areas
             'STDIO':24576,
+            'END':32767
             }
     for i in range(16):
         symbol_table['R%d'%i]=i
