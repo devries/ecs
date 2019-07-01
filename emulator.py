@@ -30,7 +30,7 @@ def main(argv):
             i+=1
 
             if args.verbose:
-                print "{:7d} -> {:5d}: {:016b}, A={:04x}, D={:04x}, SP={:5d}".format(i,pc,instruction,cpu.a,cpu.d,sp)
+                print "{:7d} -> {:5d}: {:016b}, A={:04x}, D={:04x}, SP={:5d} M(SP)={:5d}".format(i,pc,instruction,cpu.a,cpu.d,sp,cpu.peek(sp))
                 # print "    Memory of interest: 256:{:5d}, 263:{:5d}, 264:{:5d}, 265:{:5d}".format(cpu.peek(256),cpu.peek(263),cpu.peek(264),cpu.peek(265))
             time.sleep(args.sleep)
 
@@ -65,7 +65,7 @@ class HackCpu(object):
         return self
 
     def next(self):
-        if self.pc>=2**15-1:
+        if self.pc>2**15-1:
             raise StopIteration
         else:
             oldpc = self.pc
